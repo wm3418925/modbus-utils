@@ -2,32 +2,32 @@ package wangmin.modbus.handler;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import wangmin.modbus.Const;
-import wangmin.modbus.bo.ContinuousAddressBlock;
-import wangmin.modbus.bo.ModbusConnPool;
-import wangmin.modbus.bo.ModbusSlaveAddressInfo;
+import wangmin.modbus.util.ContinuousAddressBlock;
+import wangmin.modbus.util.ModbusConnPool;
+import wangmin.modbus.entity.ModbusSlaveAddressInfo;
 import wangmin.modbus.entity.type.ModbusStatus;
-import wangmin.modbus.util.CommonUtil;
-import wangmin.modbus.util.DataNodeDataUtils;
-import wangmin.modbus.util.MyModbusUtil;
+import wangmin.modbus.util.ModbusDataUtils;
+import wangmin.modbus.util.ModbusUtil;
 import net.wimpi.modbus.net.TCPMasterConnection;
-import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wangmin.modbus.entity.*;
 
 import java.util.*;
 
+/**
+ * Created by wm on 2017/1/3.
+ */
 public class ModbusDeviceHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(ModbusDeviceHandler.class);
 
     private volatile Thread thread = null;
-    private final TDevice device;
+    private final ModbusDeviceInfo device;
     private final ModbusDeviceProtocolInfo devicePi;
-    private final List<RDataNode> dataNodeList;
+    private final List<ModbusDataNodeInfo> dataNodeList;
     private ModbusConnPool modbusConnPool = null;
 
-    public ModbusDeviceHandler(TDevice device, ModbusDeviceProtocolInfo devicePi, List<RDataNode> dataNodeList) {
+    public ModbusDeviceHandler(ModbusDeviceInfo device, ModbusDeviceProtocolInfo devicePi, List<ModbusDataNodeInfo> dataNodeList) {
         this.device = device;
         this.devicePi = devicePi;
         this.dataNodeList = dataNodeList;
@@ -53,14 +53,11 @@ public class ModbusDeviceHandler implements Runnable {
      */
     private void sleepOneRound(ModbusDeviceProtocolInfo pi) {
         try {
-            int time = Const.defaultModbusDeviceHandlerSleepTime;
-            if (null != pi.sleepTime) {
-                time = pi.sleepTime;
-            }
+            int sleepTime = pi.sleepTime;
 
-            logger.info("thread={}, device={}, sleep {} second", Thread.currentThread().getName(), device, time);
+            logger.info("thread={}, device={}, sleep {} second", Thread.currentThread().getName(), device, sleepTime);
 
-            Thread.sleep(time * 1000);
+            Thread.sleep(sleepTime * 1000);
         } catch (Exception e) {
             logger.warn("", e);
         }
@@ -72,13 +69,13 @@ public class ModbusDeviceHandler implements Runnable {
     private Map<Integer, ModbusSlaveAddressInfo> generateAddressInfoMap() {
         Map<Integer, ModbusSlaveAddressInfo> res = Maps.newHashMap();
 
-        for (RDataNode dataNode : dataNodeList) {
+        for (ModbusDataNodeInfo dataNode : dataNodeList) {
             try {
-                ModbusDataNodeProtocolInfo dnProtocolInfo = ModbusDataNodeProtocolInfo.fromJsonString(dataNode.getProtocolInfo());
+                ModbusDataNodeProtocolInfo dnProtocolInfo = dataNode.getProtocolInfo();
 
                 if (null == dnProtocolInfo.rType || null == dnProtocolInfo.status || ModbusStatus.ON != ModbusStatus.valueOf(dnProtocolInfo.status))
                     continue;
-                Integer registerAddress = CommonUtil.getInteger(dnProtocolInfo.rAddr);
+                Integer registerAddress = dnProtocolInfo.rAddr;
                 if (registerAddress == null)
                     continue;
 
@@ -135,20 +132,20 @@ public class ModbusDeviceHandler implements Runnable {
                     ContinuousAddressBlock.AddressBlock blockAddress = blockAddressList.get(i);
                     switch (msai.registerType) {
                         case DI:
-                            digitalData = MyModbusUtil.readMultiInputDigital(
+                            digitalData = ModbusUtil.readMultiInputDigital(
                                     conn, slaveId, blockAddress.home, blockAddress.end-blockAddress.home);
                             break;
                         case DO:
-                            digitalData = MyModbusUtil.readMultiOutputDigital(
+                            digitalData = ModbusUtil.readMultiOutputDigital(
                                     conn, slaveId, blockAddress.home, blockAddress.end-blockAddress.home);
                             break;
                         case IR:
-                            registerData = MyModbusUtil.readInputRegistersHexBytes(
+                            registerData = ModbusUtil.readInputRegistersHexBytes(
                                     conn, slaveId, blockAddress.home,
                                     blockAddress.end-blockAddress.home);
                             break;
                         case RE:
-                            registerData = MyModbusUtil.readRegistersHexBytes(
+                            registerData = ModbusUtil.readRegistersHexBytes(
                                     conn, slaveId, blockAddress.home,
                                     blockAddress.end-blockAddress.home);
                             break;
@@ -173,9 +170,9 @@ public class ModbusDeviceHandler implements Runnable {
                     msai.registerDataList.add(null);
 
                 ++failCount;
-                // TODO DeviceDataTransferStatus.disconnected;
+                // TODO
             } else {
-                // TODO DeviceDataTransferStatus.ok;
+                // TODO
             }
         }
 
@@ -185,16 +182,16 @@ public class ModbusDeviceHandler implements Runnable {
     /**
      * 将获取到的数据, 根据数据项的地址, 映射到数据项上
      */
-    private List<HDeviceDataNodeData> mapDataToDataNodes(Map<Integer, ModbusSlaveAddressInfo> aim) {
-        List<HDeviceDataNodeData> dataList = Lists.newArrayListWithCapacity(dataNodeList.size());
+    private List<ModbusDataNodeData> mapDataToDataNodes(Map<Integer, ModbusSlaveAddressInfo> aim) {
+        List<ModbusDataNodeData> dataList = Lists.newArrayListWithCapacity(dataNodeList.size());
 
-        for (RDataNode dataNode : dataNodeList) {
+        for (ModbusDataNodeInfo dataNode : dataNodeList) {
             try {
-                ModbusDataNodeProtocolInfo dnProtocolInfo = ModbusDataNodeProtocolInfo.fromJsonString(dataNode.getProtocolInfo());
+                ModbusDataNodeProtocolInfo dnProtocolInfo = dataNode.getProtocolInfo();
 
                 if (null == dnProtocolInfo.rType || null == dnProtocolInfo.status || ModbusStatus.ON != ModbusStatus.valueOf(dnProtocolInfo.status))
                     continue;
-                Integer registerAddress = CommonUtil.getInteger(dnProtocolInfo.rAddr);
+                Integer registerAddress = dnProtocolInfo.rAddr;
                 if (registerAddress == null)
                     continue;
 
@@ -219,12 +216,12 @@ public class ModbusDeviceHandler implements Runnable {
                     int startIdx = home - block.home;
                     Boolean boolValue = msai.digitalDataList.get(idx).get(startIdx);
                     String dataStr = String.valueOf(boolValue);
-                    dataList.add(new HDeviceDataNodeData(dataNode.getId(), dataStr));
+                    dataList.add(new ModbusDataNodeData(dataNode.getId(), dataStr));
                 } else if (msai.registerType.isRegister()) {
                     int startIdx = (home - block.home)*2;   // 一个地址代表两个字节
-                    byte[] bytes = MyModbusUtil.transferModbusDataBytesOrder(msai.registerDataList.get(idx), startIdx, len, dnProtocolInfo.bot);
-                    String dataStr = DataNodeDataUtils.convertDataToStr(dataNode.getDataType(), bytes, false);
-                    dataList.add(new HDeviceDataNodeData(dataNode.getId(), dataStr));
+                    byte[] bytes = ModbusUtil.transferModbusDataBytesOrder(msai.registerDataList.get(idx), startIdx, len, dnProtocolInfo.bot);
+                    String dataStr = ModbusDataUtils.convertDataToStr(dataNode.getDataType(), bytes, false);
+                    dataList.add(new ModbusDataNodeData(dataNode.getId(), dataStr));
                 }
             } catch (Exception e) {
                 logger.warn("data node=" + dataNode, e);
@@ -239,10 +236,10 @@ public class ModbusDeviceHandler implements Runnable {
     public void run() {
         while (thread != null) {
             // 设备信息
-            ModbusDeviceProtocolInfo devicePi = ModbusDeviceProtocolInfo.fromJsonString(device.getProtocolInfo());
+            ModbusDeviceProtocolInfo devicePi = device.getProtocolInfo();
 
             // 没有连接池或者地址改变
-            if (null == modbusConnPool || !ObjectUtils.equals(devicePi.ip, modbusConnPool.getIp()) || ObjectUtils.equals(devicePi.port, modbusConnPool.getPort())) {
+            if (null == modbusConnPool || !devicePi.ip.equals(modbusConnPool.getIp()) || devicePi.port.equals(modbusConnPool.getPort())) {
                 if (null != modbusConnPool) {
                     modbusConnPool.closeAllConn();
                     modbusConnPool = null;
@@ -282,7 +279,7 @@ public class ModbusDeviceHandler implements Runnable {
             }
 
             // 将拉取后的数据根据地址映射到具体的数据项
-            List<HDeviceDataNodeData> dataList;
+            List<ModbusDataNodeData> dataList;
             try {
                 dataList = mapDataToDataNodes(aim);
             } catch (Exception e) {

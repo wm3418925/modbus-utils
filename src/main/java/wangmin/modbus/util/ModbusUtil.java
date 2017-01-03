@@ -3,7 +3,7 @@ package wangmin.modbus.util;
 import com.google.common.collect.Lists;
 
 import wangmin.modbus.entity.type.DataNodeDataType;
-import wangmin.modbus.entity.type.HexByteOrderType;
+import wangmin.modbus.entity.type.ModbusByteOrderType;
 import net.wimpi.modbus.io.BytesOutputStream;
 import net.wimpi.modbus.io.ModbusTCPTransaction;
 import net.wimpi.modbus.msg.*;
@@ -11,24 +11,23 @@ import net.wimpi.modbus.net.TCPMasterConnection;
 import net.wimpi.modbus.procimg.InputRegister;
 import net.wimpi.modbus.procimg.Register;
 import net.wimpi.modbus.procimg.SimpleInputRegister;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.util.List;
 
-public abstract class MyModbusUtil {
-    private static Logger logger = LoggerFactory.getLogger(MyModbusUtil.class);
-
+/**
+ * Created by wm on 2017/1/3.
+ */
+public abstract class ModbusUtil {
     // 字节高低位转化 (该函数是本身的逆函数, 所以互转只需要实现一个)
-    public static byte[] transferModbusDataBytesOrder(byte[] rowHexBytes, int startIdx, int len, HexByteOrderType bot) {
-        if (bot == HexByteOrderType.HighFirstBigEndian) {   // 1234 -> 1234
+    public static byte[] transferModbusDataBytesOrder(byte[] rowHexBytes, int startIdx, int len, ModbusByteOrderType bot) {
+        if (bot == ModbusByteOrderType.HighFirstBigEndian) {   // 1234 -> 1234
             byte[] sb = new byte[len];
             for (int i = 0; i < len; i++) {
                 sb[i] = rowHexBytes[startIdx + i];
             }
             return sb;
-        } else if (bot == HexByteOrderType.LowFirstBigEndian) { // 3412 -> 1234
+        } else if (bot == ModbusByteOrderType.LowFirstBigEndian) { // 3412 -> 1234
             byte[] sb = new byte[len];
             for (int i = 0; i < len; i++) {
                 if ((i & 1) == 0) {
@@ -38,14 +37,14 @@ public abstract class MyModbusUtil {
                 }
             }
             return sb;
-        } else if (bot == HexByteOrderType.HighFirstLittleEndian) { // 2143 -> 1234
+        } else if (bot == ModbusByteOrderType.HighFirstLittleEndian) { // 2143 -> 1234
             byte[] sb = new byte[len];
             for (int i = 0; i < len; i+=2) {
                 sb[i] = rowHexBytes[startIdx + i+1];
                 sb[i+1] = rowHexBytes[startIdx + i];
             }
             return sb;
-        } else {//if (bot == HexByteOrderType.LowFirstLittleEndian) {   // 4321 -> 1234
+        } else {//if (bot == ModbusByteOrderType.LowFirstLittleEndian) {   // 4321 -> 1234
             byte[] sb = new byte[len];
             for (int i = 0; i < len; i++) {
                 sb[i] = rowHexBytes[startIdx + (len - (i + 1))];
@@ -53,7 +52,7 @@ public abstract class MyModbusUtil {
             return sb;
         }
     }
-    private static String generateDataStrFromMsg(ModbusResponse msg, int byteCount, DataNodeDataType dtype, HexByteOrderType bot) {
+    private static String generateDataStrFromMsg(ModbusResponse msg, int byteCount, DataNodeDataType dtype, ModbusByteOrderType bot) {
         // 读取消息
         BytesOutputStream byteOut = new BytesOutputStream(9+byteCount);
         try {
@@ -71,7 +70,7 @@ public abstract class MyModbusUtil {
             }
 
             byte[] dataBytes = transferModbusDataBytesOrder(rawDataBytes, 0, rawDataBytes.length, bot);
-            return DataNodeDataUtils.convertDataToStr(dtype, dataBytes, true);
+            return ModbusDataUtils.convertDataToStr(dtype, dataBytes, true);
         }
 
         return "";
@@ -263,7 +262,7 @@ public abstract class MyModbusUtil {
      * dtype 字符显示形式
      * 返回 String
      */
-    public static String readInputRegisterStr(TCPMasterConnection conn, int slaveId, int address, DataNodeDataType dtype, HexByteOrderType bot) throws Exception {
+    public static String readInputRegisterStr(TCPMasterConnection conn, int slaveId, int address, DataNodeDataType dtype, ModbusByteOrderType bot) throws Exception {
         int wordCount = dtype.getByteLength()/2;
         if (wordCount <= 0)
             wordCount = 1;
@@ -280,7 +279,7 @@ public abstract class MyModbusUtil {
         // 响应数据包
         return generateDataStrFromMsg(res, res.getByteCount(), dtype, bot);
     }
-    public static String readInputRegisterStr(String ip, int port, int slaveId, int address, DataNodeDataType dtype, HexByteOrderType bot) throws Exception {
+    public static String readInputRegisterStr(String ip, int port, int slaveId, int address, DataNodeDataType dtype, ModbusByteOrderType bot) throws Exception {
         TCPMasterConnection conn = connectionModbus(ip, port);
 
         String result = readInputRegisterStr(conn, slaveId, address, dtype, bot);
@@ -325,7 +324,7 @@ public abstract class MyModbusUtil {
      * 03 Read holding Register
      * 返回 String
      */
-    public static String readRegisterStr(TCPMasterConnection conn, int slaveId, int address, DataNodeDataType dtype, HexByteOrderType bot) throws Exception {
+    public static String readRegisterStr(TCPMasterConnection conn, int slaveId, int address, DataNodeDataType dtype, ModbusByteOrderType bot) throws Exception {
         int wordCount = dtype.getByteLength()/2;
         if (wordCount <= 0)
             wordCount = 1;
@@ -340,7 +339,7 @@ public abstract class MyModbusUtil {
         // 响应数据包
         return generateDataStrFromMsg(res, res.getByteCount(), dtype, bot);
     }
-    public static String readRegisterStr(String ip, int port, int slaveId, int address, DataNodeDataType dtype, HexByteOrderType bot) throws Exception {
+    public static String readRegisterStr(String ip, int port, int slaveId, int address, DataNodeDataType dtype, ModbusByteOrderType bot) throws Exception {
         TCPMasterConnection conn = connectionModbus(ip, port);
 
         String result = readRegisterStr(conn, slaveId, address, dtype, bot);
@@ -527,8 +526,8 @@ public abstract class MyModbusUtil {
      * @param dataStr
      * @param dtype
      */
-    public static boolean writeOneDataRegister(TCPMasterConnection conn, int slaveId, int address, String dataStr, DataNodeDataType dtype, HexByteOrderType bot) throws Exception {
-        byte[] bytes = DataNodeDataUtils.convertStrToData(dtype, dataStr, false);
+    public static boolean writeOneDataRegister(TCPMasterConnection conn, int slaveId, int address, String dataStr, DataNodeDataType dtype, ModbusByteOrderType bot) throws Exception {
+        byte[] bytes = ModbusDataUtils.convertStrToData(dtype, dataStr, false);
         if (bytes.length <= 0)
             return false;
         bytes = transferModbusDataBytesOrder(bytes, 0, bytes.length, bot);
@@ -547,7 +546,7 @@ public abstract class MyModbusUtil {
 
         return writeMultiWordRegister(conn, slaveId, address, wordValues);
     }
-    public static boolean writeOneDataRegister(String ip, int port, int slaveId, int address, String dataStr, DataNodeDataType dtype, HexByteOrderType bot) throws Exception {
+    public static boolean writeOneDataRegister(String ip, int port, int slaveId, int address, String dataStr, DataNodeDataType dtype, ModbusByteOrderType bot) throws Exception {
         TCPMasterConnection conn = connectionModbus(ip, port);
 
         writeOneDataRegister(conn, slaveId, address, dataStr, dtype, bot);

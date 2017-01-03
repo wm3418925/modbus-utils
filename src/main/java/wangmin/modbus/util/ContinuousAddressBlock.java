@@ -1,11 +1,11 @@
-package wangmin.modbus.bo;
+package wangmin.modbus.util;
 
 import com.google.common.collect.Lists;
 
 import java.util.List;
 
 /**
- * Created by wm on 2016/12/30.
+ * Created by wm on 2017/1/3.
  * 将 不连续的数据块 拼接 为 连续的
  */
 public class ContinuousAddressBlock {

@@ -1,7 +1,7 @@
 package wangmin.modbus.entity.type;
 
 /**
- * Created by wm on 2016/11/24.
+ * Created by wm on 2017/1/3.
  * 数据项数据类型枚举
  */
 public enum DataNodeDataType {

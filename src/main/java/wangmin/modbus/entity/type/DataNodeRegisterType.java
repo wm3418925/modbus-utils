@@ -1,7 +1,7 @@
 package wangmin.modbus.entity.type;
 
 /**
- * Created by wm on 2016/12/28.
+ * Created by wm on 2017/1/3.
  */
 public enum DataNodeRegisterType {
     /**

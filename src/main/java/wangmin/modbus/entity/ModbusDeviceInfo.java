@@ -1,9 +1,9 @@
 package wangmin.modbus.entity;
 
-public class TDevice {
+public class ModbusDeviceInfo {
 	private Integer id;
     private String name;
-    private String protocolInfo;
+    private ModbusDeviceProtocolInfo protocolInfo;
 
 
 	@Override
@@ -14,8 +14,8 @@ public class TDevice {
 	}
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof TDevice) {
-			return this.id != null && ((TDevice) obj).id != null && ((TDevice) obj).id == this.id;
+		if (obj instanceof ModbusDeviceInfo) {
+			return this.id != null && ((ModbusDeviceInfo) obj).id != null && ((ModbusDeviceInfo) obj).id == this.id;
 		}
 		return false;
 	}
@@ -30,11 +30,11 @@ public class TDevice {
 		this.name = name;
 	}
 
-	public String getProtocolInfo() {
+	public ModbusDeviceProtocolInfo getProtocolInfo() {
 		return protocolInfo;
 	}
 
-	public void setProtocolInfo(String protocolInfo) {
+	public void setProtocolInfo(ModbusDeviceProtocolInfo protocolInfo) {
 		this.protocolInfo = protocolInfo;
 	}
 }

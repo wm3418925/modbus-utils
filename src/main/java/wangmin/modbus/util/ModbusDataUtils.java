@@ -1,18 +1,18 @@
 package wangmin.modbus.util;
 
-import wangmin.modbus.entity.RDataNode;
+import wangmin.modbus.entity.ModbusDataNodeInfo;
 import wangmin.modbus.entity.type.DataNodeDataType;
 import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created by wm on 2016/11/29.
+ * Created by wm on 2017/1/3.
  * 数据项数据操作类
  * 警告 !!!! : 数据类型不考虑uint64的最高位为1的情况
  */
-public abstract class DataNodeDataUtils {
-    private static Logger logger = LoggerFactory.getLogger(DataNodeDataUtils.class);
+public abstract class ModbusDataUtils {
+    private static Logger logger = LoggerFactory.getLogger(ModbusDataUtils.class);
 
     /**
      * 将数据转化为字符串 (如果是二进制数据, 转为16进制大写字符串显示)
@@ -349,7 +349,7 @@ public abstract class DataNodeDataUtils {
     }
 
     // 字符串数据转化, 包括 量程转换 和 表达式转换
-    public static String convertData(RDataNode dn, String value) throws Exception {
+    public static String convertData(ModbusDataNodeInfo dn, String value) throws Exception {
         if (dn.getIsRangeSwitch() == 0)
             return value;
 
@@ -358,9 +358,6 @@ public abstract class DataNodeDataUtils {
                 return value;
 
             case DataNodeDataType_bool:
-                //if (StringUtils.isNotEmpty(dn.getExpression())) {
-                    // TODO
-                //}
                 return value;
 
             case DataNodeDataType_int8:
@@ -383,9 +380,6 @@ public abstract class DataNodeDataUtils {
                 else
                     v = (v - orgLow) * (rangeHigh - rangeLow) / (orgHigh - orgLow) + rangeLow;
 
-                //if (StringUtils.isNotEmpty(dn.getExpression())) {
-                // TODO
-                //}
                 return String.valueOf(v);
             }
 
@@ -403,16 +397,13 @@ public abstract class DataNodeDataUtils {
                 else
                     v = (v - orgLow) * (rangeHigh - rangeLow) / (orgHigh - orgLow) + rangeLow;
 
-                //if (StringUtils.isNotEmpty(dn.getExpression())) {
-                // TODO
-                //}
                 return String.valueOf(v);
             }
         }
         return value;
     }
     // 字节数组数据转化, 包括 量程转换 和 表达式转换
-    public static void convertData(RDataNode dn, byte[] value) throws Exception {
+    public static void convertData(ModbusDataNodeInfo dn, byte[] value) throws Exception {
         if (dn.getIsRangeSwitch() == 0)
             return;
 
@@ -421,9 +412,6 @@ public abstract class DataNodeDataUtils {
                 return;
 
             case DataNodeDataType_bool:
-                //if (StringUtils.isNotEmpty(dn.getExpression())) {
-                // TODO
-                //}
                 return;
 
             case DataNodeDataType_int8:
@@ -471,10 +459,6 @@ public abstract class DataNodeDataUtils {
                 else
                     v = (v - orgLow) * (rangeHigh - rangeLow) / (orgHigh - orgLow) + rangeLow;
 
-                //if (StringUtils.isNotEmpty(dn.getExpression())) {
-                // TODO
-                //}
-
                 switch (dn.getDataType()) {
                     case DataNodeDataType_int8:
                         value[0] = (byte) v;
@@ -520,10 +504,6 @@ public abstract class DataNodeDataUtils {
                     v = rangeHigh;
                 else
                     v = (v - orgLow) * (rangeHigh - rangeLow) / (orgHigh - orgLow) + rangeLow;
-
-                //if (StringUtils.isNotEmpty(dn.getExpression())) {
-                // TODO
-                //}
 
                 if (DataNodeDataType.DataNodeDataType_float == dn.getDataType())
                     BinaryUtils.intToBytes(Float.floatToIntBits((float)v), value);

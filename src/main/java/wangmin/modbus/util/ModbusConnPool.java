@@ -1,7 +1,6 @@
-package wangmin.modbus.bo;
+package wangmin.modbus.util;
 
 import com.google.common.collect.Lists;
-import wangmin.modbus.util.MyModbusUtil;
 import net.wimpi.modbus.net.TCPMasterConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
- * Created by wm on 2016/12/29.
+ * Created by wm on 2017/1/3.
  */
 public class ModbusConnPool {
     private static final Logger logger = LoggerFactory.getLogger(ModbusConnPool.class);
@@ -28,7 +27,7 @@ public class ModbusConnPool {
         int retry = 0;
         while (true) {
             try {
-                return MyModbusUtil.connectionModbus(ip, port);
+                return ModbusUtil.connectionModbus(ip, port);
             } catch (Exception e) {
                 logger.warn("", e);
                 ++retry;

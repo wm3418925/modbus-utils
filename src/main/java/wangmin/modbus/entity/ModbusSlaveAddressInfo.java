@@ -1,6 +1,7 @@
-package wangmin.modbus.bo;
+package wangmin.modbus.entity;
 
 import com.google.common.collect.Lists;
+import wangmin.modbus.util.ContinuousAddressBlock;
 import wangmin.modbus.entity.type.DataNodeRegisterType;
 
 import java.util.List;
