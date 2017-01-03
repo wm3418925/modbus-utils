@@ -23,7 +23,7 @@ public class ModbusConnPool {
         int retry = 0;
         while (true) {
             try {
-                return ModbusUtils.connectionModbus(ip, port);
+                return ModbusUtils.connectionModbusSlave(ip, port);
             } catch (Exception e) {
                 ++retry;
                 if (retry >= 3) {

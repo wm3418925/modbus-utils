@@ -84,7 +84,7 @@ public class ModbusDeviceHandler implements Runnable {
                 int len;
                 if (msai.registerType.isDigital())
                     len = 1;
-                else if (msai.registerType.isWord())
+                else if (msai.registerType.isRegister())
                     len = dataNode.getDataType().getWordCount();
                 else
                     continue;
@@ -121,20 +121,20 @@ public class ModbusDeviceHandler implements Runnable {
                     ContinuousAddressBlock.AddressBlock blockAddress = blockAddressList.get(i);
                     switch (msai.registerType) {
                         case DI:
-                            digitalData = ModbusUtils.readInputDigitals(
+                            digitalData = ModbusUtils.readInputDiscretes(
                                     conn, slaveId, blockAddress.home, blockAddress.end-blockAddress.home);
                             break;
                         case DO:
-                            digitalData = ModbusUtils.readOutputDigitals(
+                            digitalData = ModbusUtils.readCoils(
                                     conn, slaveId, blockAddress.home, blockAddress.end-blockAddress.home);
                             break;
                         case IR:
-                            registerData = ModbusUtils.readInputWordsBytes(
+                            registerData = ModbusUtils.readInputRegisters(
                                     conn, slaveId, blockAddress.home,
                                     blockAddress.end-blockAddress.home);
                             break;
                         case RE:
-                            registerData = ModbusUtils.readWordsBytes(
+                            registerData = ModbusUtils.readRegisters(
                                     conn, slaveId, blockAddress.home,
                                     blockAddress.end-blockAddress.home);
                             break;
@@ -144,7 +144,7 @@ public class ModbusDeviceHandler implements Runnable {
 
                     if (msai.registerType.isDigital())
                         msai.digitalDataList.add(digitalData);
-                    else if (msai.registerType.isWord())
+                    else if (msai.registerType.isRegister())
                         msai.registerDataList.add(registerData);
                 }
             } catch (Exception e) {
@@ -154,7 +154,7 @@ public class ModbusDeviceHandler implements Runnable {
             if (null == digitalData && null == registerData) {
                 if (msai.registerType.isDigital())
                     msai.digitalDataList.add(null);
-                else if (msai.registerType.isWord())
+                else if (msai.registerType.isRegister())
                     msai.registerDataList.add(null);
 
                 ++failCount;
@@ -205,7 +205,7 @@ public class ModbusDeviceHandler implements Runnable {
                     Boolean boolValue = msai.digitalDataList.get(idx).get(startIdx);
                     String dataStr = String.valueOf(boolValue);
                     dataList.add(new ModbusDataNodeData(dataNode.getId(), dataStr));
-                } else if (msai.registerType.isWord()) {
+                } else if (msai.registerType.isRegister()) {
                     int startIdx = (home - block.home)*2;   // 一个地址代表两个字节
                     byte[] bytes = ModbusUtils.transferModbusDataBytesOrder(msai.registerDataList.get(idx), startIdx, len, dnProtocolInfo.bot);
                     String dataStr = ModbusDataUtils.convertDataToStr(dataNode.getDataType(), bytes, false);

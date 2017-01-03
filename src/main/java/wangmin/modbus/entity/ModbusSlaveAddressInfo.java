@@ -23,7 +23,7 @@ public class ModbusSlaveAddressInfo {
 
         if (registerType.isDigital())
             digitalDataList = Lists.newArrayList();
-        else if (registerType.isWord())
+        else if (registerType.isRegister())
             registerDataList = Lists.newArrayList();
     }
 }

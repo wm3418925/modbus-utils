@@ -24,7 +24,7 @@ public enum ModbusRegisterType {
     public boolean isDigital() {
         return this == DO || this == DI;
     }
-    public boolean isWord() {
+    public boolean isRegister() {
         return this == RE || this == IR;
     }
     public boolean isInput() {
