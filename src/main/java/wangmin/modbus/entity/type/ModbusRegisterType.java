@@ -3,7 +3,7 @@ package wangmin.modbus.entity.type;
 /**
  * Created by wm on 2017/1/3.
  */
-public enum DataNodeRegisterType {
+public enum ModbusRegisterType {
     /**
      * 线圈寄存器，按位操作，可读可写
      */

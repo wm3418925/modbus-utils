@@ -7,7 +7,7 @@ import wangmin.modbus.util.ModbusConnPool;
 import wangmin.modbus.entity.ModbusSlaveAddressInfo;
 import wangmin.modbus.entity.type.ModbusStatus;
 import wangmin.modbus.util.ModbusDataUtils;
-import wangmin.modbus.util.ModbusUtil;
+import wangmin.modbus.util.ModbusUtils;
 import net.wimpi.modbus.net.TCPMasterConnection;
 import wangmin.modbus.entity.*;
 
@@ -121,20 +121,20 @@ public class ModbusDeviceHandler implements Runnable {
                     ContinuousAddressBlock.AddressBlock blockAddress = blockAddressList.get(i);
                     switch (msai.registerType) {
                         case DI:
-                            digitalData = ModbusUtil.readMultiInputDigital(
+                            digitalData = ModbusUtils.readInputDigitals(
                                     conn, slaveId, blockAddress.home, blockAddress.end-blockAddress.home);
                             break;
                         case DO:
-                            digitalData = ModbusUtil.readMultiOutputDigital(
+                            digitalData = ModbusUtils.readOutputDigitals(
                                     conn, slaveId, blockAddress.home, blockAddress.end-blockAddress.home);
                             break;
                         case IR:
-                            registerData = ModbusUtil.readInputRegistersHexBytes(
+                            registerData = ModbusUtils.readInputWordsBytes(
                                     conn, slaveId, blockAddress.home,
                                     blockAddress.end-blockAddress.home);
                             break;
                         case RE:
-                            registerData = ModbusUtil.readRegistersHexBytes(
+                            registerData = ModbusUtils.readWordsBytes(
                                     conn, slaveId, blockAddress.home,
                                     blockAddress.end-blockAddress.home);
                             break;
@@ -207,7 +207,7 @@ public class ModbusDeviceHandler implements Runnable {
                     dataList.add(new ModbusDataNodeData(dataNode.getId(), dataStr));
                 } else if (msai.registerType.isWord()) {
                     int startIdx = (home - block.home)*2;   // 一个地址代表两个字节
-                    byte[] bytes = ModbusUtil.transferModbusDataBytesOrder(msai.registerDataList.get(idx), startIdx, len, dnProtocolInfo.bot);
+                    byte[] bytes = ModbusUtils.transferModbusDataBytesOrder(msai.registerDataList.get(idx), startIdx, len, dnProtocolInfo.bot);
                     String dataStr = ModbusDataUtils.convertDataToStr(dataNode.getDataType(), bytes, false);
                     dataList.add(new ModbusDataNodeData(dataNode.getId(), dataStr));
                 }

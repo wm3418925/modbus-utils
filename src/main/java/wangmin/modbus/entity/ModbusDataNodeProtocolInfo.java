@@ -1,6 +1,6 @@
 package wangmin.modbus.entity;
 
-import wangmin.modbus.entity.type.DataNodeRegisterType;
+import wangmin.modbus.entity.type.ModbusRegisterType;
 import wangmin.modbus.entity.type.ModbusByteOrderType;
 
 /**
@@ -10,6 +10,6 @@ public class ModbusDataNodeProtocolInfo {
     public Integer status;
     public Integer slaveId;
     public Integer rAddr;
-    public DataNodeRegisterType rType;
+    public ModbusRegisterType rType;
     public ModbusByteOrderType bot;
 }

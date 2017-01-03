@@ -1,6 +1,6 @@
 package wangmin.modbus.entity;
 
-import wangmin.modbus.entity.type.DataNodeDataType;
+import wangmin.modbus.entity.type.ModbusDataType;
 
 /**
  * Created by wm on 2017/1/3.
@@ -10,7 +10,7 @@ public class ModbusDataNodeInfo {
     private long id;
 
     private int deviceId;
-    private DataNodeDataType dataType;
+    private ModbusDataType dataType;
     private String name;
     private String unit;
     private ModbusDataNodeProtocolInfo protocolInfo;
@@ -70,11 +70,11 @@ public class ModbusDataNodeInfo {
         this.deviceId = deviceId;
     }
 
-    public DataNodeDataType getDataType() {
+    public ModbusDataType getDataType() {
         return dataType;
     }
 
-    public void setDataType(DataNodeDataType dataType) {
+    public void setDataType(ModbusDataType dataType) {
         this.dataType = dataType;
     }
 

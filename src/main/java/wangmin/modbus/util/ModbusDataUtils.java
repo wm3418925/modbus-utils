@@ -1,7 +1,7 @@
 package wangmin.modbus.util;
 
 import wangmin.modbus.entity.ModbusDataNodeInfo;
-import wangmin.modbus.entity.type.DataNodeDataType;
+import wangmin.modbus.entity.type.ModbusDataType;
 import org.apache.commons.codec.binary.Hex;
 
 /**
@@ -13,8 +13,8 @@ public abstract class ModbusDataUtils {
     /**
      * 将数据转化为字符串 (如果是二进制数据, 转为16进制大写字符串显示)
      */
-    public static String convertDataToStr(DataNodeDataType type, byte[] data, boolean hexWithPrefix) {
-        if (type == DataNodeDataType.DataNodeDataType_void) {
+    public static String convertDataToStr(ModbusDataType type, byte[] data, boolean hexWithPrefix) {
+        if (type == ModbusDataType.DataNodeDataType_void) {
             if (null == data)
                 return "";
 
@@ -28,14 +28,14 @@ public abstract class ModbusDataUtils {
         if (null == data || 0 == data.length)
             return "";
 
-        if (type == DataNodeDataType.DataNodeDataType_bool) {
+        if (type == ModbusDataType.DataNodeDataType_bool) {
             if (data[0] != 0)
                 return "TRUE";
             else
                 return "FALSE";
         }
 
-        if (type == DataNodeDataType.DataNodeDataType_float) {
+        if (type == ModbusDataType.DataNodeDataType_float) {
             try {
                 int intBits = BinaryUtils.bytesToInt(data);
                 return String.valueOf(Float.intBitsToFloat(intBits));
@@ -43,7 +43,7 @@ public abstract class ModbusDataUtils {
                 return "";
             }
         }
-        if (type == DataNodeDataType.DataNodeDataType_double) {
+        if (type == ModbusDataType.DataNodeDataType_double) {
             try {
                 long longBits = BinaryUtils.bytesToLong(data);
                 return String.valueOf(Double.longBitsToDouble(longBits));
@@ -79,12 +79,12 @@ public abstract class ModbusDataUtils {
     /**
      * 将字符串转化为数据
      */
-    public static byte[] convertStrToData(DataNodeDataType type, String str, boolean hexWithPrefix) {
+    public static byte[] convertStrToData(ModbusDataType type, String str, boolean hexWithPrefix) {
         if (str != null)
             str = str.toUpperCase();
 
         try {
-            if (type == DataNodeDataType.DataNodeDataType_void) {
+            if (type == ModbusDataType.DataNodeDataType_void) {
                 if (null == str)
                     return emptyByte;
 
@@ -101,7 +101,7 @@ public abstract class ModbusDataUtils {
             if (null == str || 0 == str.length())
                 return emptyByte;
 
-            if (type == DataNodeDataType.DataNodeDataType_bool) {
+            if (type == ModbusDataType.DataNodeDataType_bool) {
                 if ("TRUE".equals(str))
                     return trueBytes;
                 else if ("FALSE".equals(str))
@@ -110,12 +110,12 @@ public abstract class ModbusDataUtils {
                     return emptyByte;
             }
 
-            if (type == DataNodeDataType.DataNodeDataType_float) {
+            if (type == ModbusDataType.DataNodeDataType_float) {
                 float f = Float.valueOf(str);
                 int i = Float.floatToIntBits(f);
                 return BinaryUtils.intToBytes(i);
             }
-            if (type == DataNodeDataType.DataNodeDataType_double) {
+            if (type == ModbusDataType.DataNodeDataType_double) {
                 double d = Double.valueOf(str);
                 long l = Double.doubleToLongBits(d);
                 return BinaryUtils.longToBytes(l);
@@ -147,8 +147,8 @@ public abstract class ModbusDataUtils {
 
 
     // 预处理数据配置字符串
-    public static String preHandleDataStr(DataNodeDataType type, String a) {
-        if (type == DataNodeDataType.DataNodeDataType_void)
+    public static String preHandleDataStr(ModbusDataType type, String a) {
+        if (type == ModbusDataType.DataNodeDataType_void)
             return a;
         if (a == null)
             return null;
@@ -160,17 +160,17 @@ public abstract class ModbusDataUtils {
     }
 
     // 预处理之后 对数据验证
-    public static boolean validateData(DataNodeDataType type, String a) {
-        if (type == DataNodeDataType.DataNodeDataType_void)
+    public static boolean validateData(ModbusDataType type, String a) {
+        if (type == ModbusDataType.DataNodeDataType_void)
             return true;
 
         if (null == a || 0 == a.length())
             return false;
 
-        if (type == DataNodeDataType.DataNodeDataType_bool)
+        if (type == ModbusDataType.DataNodeDataType_bool)
             return "true".compareToIgnoreCase(a) == 0 || "false".compareToIgnoreCase(a) == 0;
 
-        if (type == DataNodeDataType.DataNodeDataType_float) {
+        if (type == ModbusDataType.DataNodeDataType_float) {
             try {
                 Float.valueOf(a);
                 return true;
@@ -178,7 +178,7 @@ public abstract class ModbusDataUtils {
                 return false;
             }
         }
-        if (type == DataNodeDataType.DataNodeDataType_double) {
+        if (type == ModbusDataType.DataNodeDataType_double) {
             try {
                 Double.valueOf(a);
                 return true;
@@ -241,7 +241,7 @@ public abstract class ModbusDataUtils {
     }
 
     // 字符串数据值 与 字符串数据值 比较
-    public static int compareData(DataNodeDataType type, String a, String b) {
+    public static int compareData(ModbusDataType type, String a, String b) {
         int strCmp = a.compareTo(b);
         if (0 == strCmp) return 0;
 
@@ -270,7 +270,7 @@ public abstract class ModbusDataUtils {
         return 0;
     }
     // 字符串数据值 与 字节数组数据值 比较
-    public static int compareData(DataNodeDataType type, String a, byte[] b) throws Exception {
+    public static int compareData(ModbusDataType type, String a, byte[] b) throws Exception {
         if (null == a && null == b)
             return 0;
         if (null == a && null != b)
@@ -484,9 +484,9 @@ public abstract class ModbusDataUtils {
             case DataNodeDataType_float:
             case DataNodeDataType_double: {
                 double v;
-                if (DataNodeDataType.DataNodeDataType_float == dn.getDataType())
+                if (ModbusDataType.DataNodeDataType_float == dn.getDataType())
                     v = Float.intBitsToFloat(BinaryUtils.bytesToInt(value));
-                else //if (DataNodeDataType.DataNodeDataType_double == dn.getDataType())
+                else //if (ModbusDataType.DataNodeDataType_double == dn.getDataType())
                     v = Double.longBitsToDouble(BinaryUtils.bytesToLong(value));
 
                 double orgLow = Double.valueOf(dn.getOrgLow());
@@ -500,9 +500,9 @@ public abstract class ModbusDataUtils {
                 else
                     v = (v - orgLow) * (rangeHigh - rangeLow) / (orgHigh - orgLow) + rangeLow;
 
-                if (DataNodeDataType.DataNodeDataType_float == dn.getDataType())
+                if (ModbusDataType.DataNodeDataType_float == dn.getDataType())
                     BinaryUtils.intToBytes(Float.floatToIntBits((float)v), value);
-                else //if (DataNodeDataType.DataNodeDataType_double == dn.getDataType())
+                else //if (ModbusDataType.DataNodeDataType_double == dn.getDataType())
                     BinaryUtils.longToBytes(Double.doubleToLongBits(v), value);
                 return;
             }
