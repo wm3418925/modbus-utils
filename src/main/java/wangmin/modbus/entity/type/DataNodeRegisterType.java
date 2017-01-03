@@ -24,7 +24,7 @@ public enum DataNodeRegisterType {
     public boolean isDigital() {
         return this == DO || this == DI;
     }
-    public boolean isRegister() {
+    public boolean isWord() {
         return this == RE || this == IR;
     }
     public boolean isInput() {

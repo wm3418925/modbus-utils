@@ -3,8 +3,6 @@ package wangmin.modbus.util;
 import wangmin.modbus.entity.ModbusDataNodeInfo;
 import wangmin.modbus.entity.type.DataNodeDataType;
 import org.apache.commons.codec.binary.Hex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Created by wm on 2017/1/3.
@@ -12,8 +10,6 @@ import org.slf4j.LoggerFactory;
  * 警告 !!!! : 数据类型不考虑uint64的最高位为1的情况
  */
 public abstract class ModbusDataUtils {
-    private static Logger logger = LoggerFactory.getLogger(ModbusDataUtils.class);
-
     /**
      * 将数据转化为字符串 (如果是二进制数据, 转为16进制大写字符串显示)
      */
@@ -145,7 +141,6 @@ public abstract class ModbusDataUtils {
 
             return emptyByte;
         } catch (Exception e) {
-            logger.warn("", e);
             return emptyByte;
         }
     }

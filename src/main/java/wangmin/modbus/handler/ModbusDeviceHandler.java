@@ -9,8 +9,6 @@ import wangmin.modbus.entity.type.ModbusStatus;
 import wangmin.modbus.util.ModbusDataUtils;
 import wangmin.modbus.util.ModbusUtil;
 import net.wimpi.modbus.net.TCPMasterConnection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import wangmin.modbus.entity.*;
 
 import java.util.*;
@@ -19,8 +17,6 @@ import java.util.*;
  * Created by wm on 2017/1/3.
  */
 public class ModbusDeviceHandler implements Runnable {
-    private static final Logger logger = LoggerFactory.getLogger(ModbusDeviceHandler.class);
-
     private volatile Thread thread = null;
     private final ModbusDeviceInfo device;
     private final ModbusDeviceProtocolInfo devicePi;
@@ -34,14 +30,11 @@ public class ModbusDeviceHandler implements Runnable {
     }
 
     public void start() {
-        logger.info("{} start modbus device handler thread, device={}", Thread.currentThread().getName(), device);
-
         thread = new Thread(this, "ModbusDeviceHandler");
         thread.start();
     }
 
     public synchronized void stop() {
-        logger.info("{} stop modbus device handler thread, device={}", Thread.currentThread().getName(), device);
         thread = null;
     }
 
@@ -54,12 +47,8 @@ public class ModbusDeviceHandler implements Runnable {
     private void sleepOneRound(ModbusDeviceProtocolInfo pi) {
         try {
             int sleepTime = pi.sleepTime;
-
-            logger.info("thread={}, device={}, sleep {} second", Thread.currentThread().getName(), device, sleepTime);
-
             Thread.sleep(sleepTime * 1000);
         } catch (Exception e) {
-            logger.warn("", e);
         }
     }
 
@@ -95,14 +84,14 @@ public class ModbusDeviceHandler implements Runnable {
                 int len;
                 if (msai.registerType.isDigital())
                     len = 1;
-                else if (msai.registerType.isRegister())
+                else if (msai.registerType.isWord())
                     len = dataNode.getDataType().getWordCount();
                 else
                     continue;
 
                 msai.cab.addBlock(home, home+len);
             } catch (Exception e) {
-                logger.warn("data node=" + dataNode, e);
+                System.out.println("data node=" + dataNode + ", e="+e.getMessage());
                 continue;
             }
         }
@@ -155,18 +144,17 @@ public class ModbusDeviceHandler implements Runnable {
 
                     if (msai.registerType.isDigital())
                         msai.digitalDataList.add(digitalData);
-                    else if (msai.registerType.isRegister())
+                    else if (msai.registerType.isWord())
                         msai.registerDataList.add(registerData);
                 }
             } catch (Exception e) {
-                logger.warn("slaveId={}, msai={}", slaveId, msai);
-                logger.warn("", e);
+                System.out.println("slaveId=" + slaveId + ", msai=" + msai + ", e="+e.getMessage());
             }
 
             if (null == digitalData && null == registerData) {
                 if (msai.registerType.isDigital())
                     msai.digitalDataList.add(null);
-                else if (msai.registerType.isRegister())
+                else if (msai.registerType.isWord())
                     msai.registerDataList.add(null);
 
                 ++failCount;
@@ -217,14 +205,14 @@ public class ModbusDeviceHandler implements Runnable {
                     Boolean boolValue = msai.digitalDataList.get(idx).get(startIdx);
                     String dataStr = String.valueOf(boolValue);
                     dataList.add(new ModbusDataNodeData(dataNode.getId(), dataStr));
-                } else if (msai.registerType.isRegister()) {
+                } else if (msai.registerType.isWord()) {
                     int startIdx = (home - block.home)*2;   // 一个地址代表两个字节
                     byte[] bytes = ModbusUtil.transferModbusDataBytesOrder(msai.registerDataList.get(idx), startIdx, len, dnProtocolInfo.bot);
                     String dataStr = ModbusDataUtils.convertDataToStr(dataNode.getDataType(), bytes, false);
                     dataList.add(new ModbusDataNodeData(dataNode.getId(), dataStr));
                 }
             } catch (Exception e) {
-                logger.warn("data node=" + dataNode, e);
+                System.out.println("dataNode=" + dataNode + ", e="+e.getMessage());
                 continue;
             }
         }
@@ -248,7 +236,7 @@ public class ModbusDeviceHandler implements Runnable {
                 try {
                     modbusConnPool = new ModbusConnPool(devicePi.ip, devicePi.port, 1);
                 } catch (Exception e) {
-                    logger.warn("", e);
+                    e.printStackTrace();
                     sleepOneRound(devicePi);
                     continue;
                 }
@@ -271,7 +259,7 @@ public class ModbusDeviceHandler implements Runnable {
             try {
                 failCount = pullAllDataByBlock(conn, aim);
             } catch (Exception e) {
-                logger.warn("", e);
+                e.printStackTrace();
                 sleepOneRound(devicePi);
                 continue;
             } finally {
@@ -283,7 +271,7 @@ public class ModbusDeviceHandler implements Runnable {
             try {
                 dataList = mapDataToDataNodes(aim);
             } catch (Exception e) {
-                logger.warn("", e);
+                e.printStackTrace();
                 sleepOneRound(devicePi);
                 continue;
             }
@@ -293,7 +281,7 @@ public class ModbusDeviceHandler implements Runnable {
                 try {
                     // TODO
                 } catch (Exception e) {
-                    logger.warn("", e);
+                    e.printStackTrace();
                     sleepOneRound(devicePi);
                     continue;
                 }

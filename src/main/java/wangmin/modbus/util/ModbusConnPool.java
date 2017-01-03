@@ -2,8 +2,6 @@ package wangmin.modbus.util;
 
 import com.google.common.collect.Lists;
 import net.wimpi.modbus.net.TCPMasterConnection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -11,8 +9,6 @@ import java.util.List;
  * Created by wm on 2017/1/3.
  */
 public class ModbusConnPool {
-    private static final Logger logger = LoggerFactory.getLogger(ModbusConnPool.class);
-
     private volatile boolean flag = true;
 
     private final String ip;
@@ -29,7 +25,6 @@ public class ModbusConnPool {
             try {
                 return ModbusUtil.connectionModbus(ip, port);
             } catch (Exception e) {
-                logger.warn("", e);
                 ++retry;
                 if (retry >= 3) {
                     throw e;
@@ -48,7 +43,6 @@ public class ModbusConnPool {
                 conn = connOneWithRetry();
             } catch (Exception e) {
                 if (!availConns.isEmpty()) {
-                    logger.warn("", e);
                     return;
                 } else {
                     throw e;
@@ -97,7 +91,6 @@ public class ModbusConnPool {
 
                 return conn;
             } catch (Exception e) {
-                logger.warn("", e);
                 return null;
             }
         }
@@ -133,7 +126,6 @@ public class ModbusConnPool {
         try {
             Thread.sleep(3000);
         } catch (Exception e) {
-            logger.warn("", e);
         }
 
         // 强制关闭所有连接
