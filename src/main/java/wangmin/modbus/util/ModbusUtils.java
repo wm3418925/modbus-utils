@@ -80,8 +80,8 @@ public abstract class ModbusUtils {
     /**
      * 连接modbus服务器
      * */
-    public static TCPMasterConnection connectionModbusSlave(String ip, int port) throws Exception {
-        InetAddress inetAddress = InetAddress.getByName(ip);
+    public static TCPMasterConnection connectionModbusSlave(String host, int port) throws Exception {
+        InetAddress inetAddress = InetAddress.getByName(host);
         TCPMasterConnection conn = new TCPMasterConnection(inetAddress);
         conn.setPort(port);
         conn.connect();
@@ -103,8 +103,8 @@ public abstract class ModbusUtils {
 
         return res.getDiscretes().getBit(0);
     }
-    public static boolean readOneInputDiscrete(String ip, int port, int slaveId, int address) throws Exception {
-        TCPMasterConnection conn = connectionModbusSlave(ip, port);
+    public static boolean readOneInputDiscrete(String host, int port, int slaveId, int address) throws Exception {
+        TCPMasterConnection conn = connectionModbusSlave(host, port);
 
         boolean result = readOneInputDiscrete(conn, slaveId, address);
 
@@ -131,8 +131,8 @@ public abstract class ModbusUtils {
             result.add(response.getDiscretes().getBit(i));
         return result;
     }
-    public static List<Boolean> readInputDiscretes(String ip, int port, int slaveId, int address, int bitCount) throws Exception {
-        TCPMasterConnection conn = connectionModbusSlave(ip, port);
+    public static List<Boolean> readInputDiscretes(String host, int port, int slaveId, int address, int bitCount) throws Exception {
+        TCPMasterConnection conn = connectionModbusSlave(host, port);
 
         List<Boolean> result = readInputDiscretes(conn, slaveId, address, bitCount);
 
@@ -155,8 +155,8 @@ public abstract class ModbusUtils {
 
         return res.getCoils().getBit(0);
     }
-    public static boolean readOneCoil(String ip, int port, int slaveId, int address) throws Exception {
-        TCPMasterConnection conn = connectionModbusSlave(ip, port);
+    public static boolean readOneCoil(String host, int port, int slaveId, int address) throws Exception {
+        TCPMasterConnection conn = connectionModbusSlave(host, port);
 
         boolean result = readOneCoil(conn, slaveId, address);
 
@@ -182,8 +182,8 @@ public abstract class ModbusUtils {
             result.add(response.getCoils().getBit(i));
         return result;
     }
-    public static List<Boolean> readCoils(String ip, int port, int slaveId, int address, int bitCount) throws Exception {
-        TCPMasterConnection conn = connectionModbusSlave(ip, port);
+    public static List<Boolean> readCoils(String host, int port, int slaveId, int address, int bitCount) throws Exception {
+        TCPMasterConnection conn = connectionModbusSlave(host, port);
 
         List<Boolean> result = readCoils(conn, slaveId, address, bitCount);
 
@@ -207,8 +207,8 @@ public abstract class ModbusUtils {
 
         return res.getRegisterValue(0);
     }
-    public static int readOneInputRegister(String ip, int port, int slaveId, int address) throws Exception {
-        TCPMasterConnection conn = connectionModbusSlave(ip, port);
+    public static int readOneInputRegister(String host, int port, int slaveId, int address) throws Exception {
+        TCPMasterConnection conn = connectionModbusSlave(host, port);
 
         int result = readOneInputRegister(conn, slaveId, address);
 
@@ -237,8 +237,8 @@ public abstract class ModbusUtils {
 
         return generateDataStrFromMsg(res, res.getByteCount(), dtype, bot);
     }
-    public static String readInputRegistersDataStr(String ip, int port, int slaveId, int address, ModbusDataType dtype, ModbusByteOrderType bot) throws Exception {
-        TCPMasterConnection conn = connectionModbusSlave(ip, port);
+    public static String readInputRegistersDataStr(String host, int port, int slaveId, int address, ModbusDataType dtype, ModbusByteOrderType bot) throws Exception {
+        TCPMasterConnection conn = connectionModbusSlave(host, port);
 
         String result = readInputRegistersDataStr(conn, slaveId, address, dtype, bot);
 
@@ -262,8 +262,8 @@ public abstract class ModbusUtils {
 
         return res.getRegisterValue(0);
     }
-    public static int readOneRegister(String ip, int port, int slaveId, int address) throws Exception {
-        TCPMasterConnection conn = connectionModbusSlave(ip, port);
+    public static int readOneRegister(String host, int port, int slaveId, int address) throws Exception {
+        TCPMasterConnection conn = connectionModbusSlave(host, port);
 
         int result = readOneRegister(conn, slaveId, address);
 
@@ -290,8 +290,8 @@ public abstract class ModbusUtils {
 
         return generateDataStrFromMsg(res, res.getByteCount(), dtype, bot);
     }
-    public static String readRegistersDataStr(String ip, int port, int slaveId, int address, ModbusDataType dtype, ModbusByteOrderType bot) throws Exception {
-        TCPMasterConnection conn = connectionModbusSlave(ip, port);
+    public static String readRegistersDataStr(String host, int port, int slaveId, int address, ModbusDataType dtype, ModbusByteOrderType bot) throws Exception {
+        TCPMasterConnection conn = connectionModbusSlave(host, port);
 
         String result = readRegistersDataStr(conn, slaveId, address, dtype, bot);
 
@@ -325,8 +325,8 @@ public abstract class ModbusUtils {
             throw new Exception();
         }
     }
-    public static byte[] readInputRegisters(String ip, int port, int slaveId, int address, int wordCount) throws Exception {
-        TCPMasterConnection conn = connectionModbusSlave(ip, port);
+    public static byte[] readInputRegisters(String host, int port, int slaveId, int address, int wordCount) throws Exception {
+        TCPMasterConnection conn = connectionModbusSlave(host, port);
 
         byte[] result = readInputRegisters(conn, slaveId, address, wordCount);
 
@@ -358,8 +358,8 @@ public abstract class ModbusUtils {
             throw new Exception();
         }
     }
-    public static byte[] readRegisters(String ip, int port, int slaveId, int address, int wordCount) throws Exception {
-        TCPMasterConnection conn = connectionModbusSlave(ip, port);
+    public static byte[] readRegisters(String host, int port, int slaveId, int address, int wordCount) throws Exception {
+        TCPMasterConnection conn = connectionModbusSlave(host, port);
 
         byte[] result = readRegisters(conn, slaveId, address, wordCount);
 
@@ -385,8 +385,8 @@ public abstract class ModbusUtils {
         trans.execute();
         return true;
     }
-    public static boolean writeOneCoil(String ip, int port, int slaveId, int address, boolean value) throws Exception {
-        TCPMasterConnection conn = connectionModbusSlave(ip, port);
+    public static boolean writeOneCoil(String host, int port, int slaveId, int address, boolean value) throws Exception {
+        TCPMasterConnection conn = connectionModbusSlave(host, port);
 
         writeOneCoil(conn, slaveId, address, value);
 
@@ -412,8 +412,8 @@ public abstract class ModbusUtils {
         trans.execute();
         return true;
     }
-    public static boolean writeOneRegister(String ip, int port, int slaveId, int address, int value) throws Exception {
-        TCPMasterConnection conn = connectionModbusSlave(ip, port);
+    public static boolean writeOneRegister(String host, int port, int slaveId, int address, int value) throws Exception {
+        TCPMasterConnection conn = connectionModbusSlave(host, port);
 
         writeOneRegister(conn, slaveId, address, value);
 
@@ -448,8 +448,8 @@ public abstract class ModbusUtils {
 
         return true;
     }
-    public static boolean writeRegisters(String ip, int port, int slaveId, int address, List<Integer> wordValues) throws Exception {
-        TCPMasterConnection conn = connectionModbusSlave(ip, port);
+    public static boolean writeRegisters(String host, int port, int slaveId, int address, List<Integer> wordValues) throws Exception {
+        TCPMasterConnection conn = connectionModbusSlave(host, port);
 
         writeRegisters(conn, slaveId, address, wordValues);
 
@@ -486,8 +486,8 @@ public abstract class ModbusUtils {
 
         return writeRegisters(conn, slaveId, address, wordValues);
     }
-    public static boolean writeRegistersByDataStr(String ip, int port, int slaveId, int address, String dataStr, ModbusDataType dtype, ModbusByteOrderType bot) throws Exception {
-        TCPMasterConnection conn = connectionModbusSlave(ip, port);
+    public static boolean writeRegistersByDataStr(String host, int port, int slaveId, int address, String dataStr, ModbusDataType dtype, ModbusByteOrderType bot) throws Exception {
+        TCPMasterConnection conn = connectionModbusSlave(host, port);
 
         writeRegistersByDataStr(conn, slaveId, address, dataStr, dtype, bot);
 

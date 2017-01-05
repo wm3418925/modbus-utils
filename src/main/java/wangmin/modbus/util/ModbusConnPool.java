@@ -11,8 +11,8 @@ import java.util.List;
 public class ModbusConnPool {
     private volatile boolean flag = true;
 
-    private final String ip;
-    public String getIp() {return ip;}
+    private final String host;
+    public String getHost() {return host;}
     private final int port;
     public int getPort() {return port;}
 
@@ -23,7 +23,7 @@ public class ModbusConnPool {
         int retry = 0;
         while (true) {
             try {
-                return ModbusUtils.connectionModbusSlave(ip, port);
+                return ModbusUtils.connectionModbusSlave(host, port);
             } catch (Exception e) {
                 ++retry;
                 if (retry >= 3) {
@@ -33,8 +33,8 @@ public class ModbusConnPool {
         }
     }
 
-    public ModbusConnPool(String ip, int port, int initialConnectionCount) throws Exception {
-        this.ip = ip;
+    public ModbusConnPool(String host, int port, int initialConnectionCount) throws Exception {
+        this.host = host;
         this.port = port;
 
         while (availConns.size() < initialConnectionCount) {
